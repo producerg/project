@@ -5,6 +5,10 @@
 #include "data_set.h"
 
 // to measure runtime
+/*
+	이건 원 소스코드 저자가 측정 시간을 테스트하기위해 넣은 함수
+	우리는 사용하지 않아도 됨.
+*/
 clock_t start, end;
 double cpu_time_used;
 
@@ -16,9 +20,14 @@ double cpu_time_used;
 #define NO_PATTERNS 4
 
 // number of training epochs (iterations)
+/*
+	epochs : 전체 데이터 이용, 한 바퀴 돌며 학습하는 것을 말함.
+	여기서 epochs의 no를 200으로 설정하였으니 전체 데이터셋을 200바퀴 돌아 학습.
+*/
 const int no_epochs = 200;
 
 // logistic regression values for backpropagation
+// 역전파 로지스틱 회귀 웨이트
 const double LR_IH = 0.7;
 const double LR_HO = 0.07;
 
@@ -30,17 +39,25 @@ double pattern_error = 0.0;
 double rms_error = 0.0;
 
 // vector to store results in hidden layer
+// 입력층->은닉층 순서로 갔을 때 결과값 저장할 내용.
 double values_hidden_layer[NO_HIDDEN_NEURONS];
 
 // weight matrices
+// 웨이트 값 저장되는 배열
 double weights_IH[NO_INPUT_NEURONS][NO_HIDDEN_NEURONS];
+// 입력층~은닉층 사이 웨이트(이차원)
 double weights_HO[NO_HIDDEN_NEURONS];
+// 은닉층~입력층 사이 웨이트
 
 // arrays to store training data
+// 학습 데이터를 저장할 배열 선언
 int input_data[NO_PATTERNS][NO_INPUT_NEURONS];
 int output_data[NO_PATTERNS];				// 출력층 데이터 0~9까지 입력되도록 함.
 
-// ann functions
+											// ann functions
+/*
+	함수 선언
+*/
 double get_rand();
 void init_data();
 void init_weights();
@@ -86,20 +103,24 @@ void init_data(void)
 }
 
 // init weights with random values
+// 각 웨이트를 랜덤값으로 정의함.(초기화)
 void init_weights(void)
 {
 	for (int j = 0; j < NO_HIDDEN_NEURONS; j++)
-	{
+	{	// 은닉층~출력층 사이의 웨이트.
 		weights_HO[j] = (get_rand() - 0.5) / 2;
 
 		for (int i = 0; i < NO_INPUT_NEURONS; i++)
-		{
+		{	/* 
+				입력층~은닉층 사이 웨이트
+			*/
 			weights_IH[i][j] = (get_rand() - 0.5) / 5;
 		}
 	}
 }
 
 // feed the data forward through the neural network
+// 정방향으로 신경망에 데이터를 입력.
 void feed_forward(void)
 {
 	int i = 0;
@@ -108,6 +129,7 @@ void feed_forward(void)
 		values_hidden_layer[i] = 0.0;
 
 		// matrix multiplication of inputs and weights
+		// 인풋과 웨이트의 행렬곱.
 		for (int j = 0; j < NO_INPUT_NEURONS; j++)
 		{
 			values_hidden_layer[i] += input_data[pattern_no][j] * weights_IH[j][i];
@@ -125,16 +147,20 @@ void feed_forward(void)
 		actual_output += values_hidden_layer[i] * weights_HO[i];
 	}
 	// calculate error for this pattern
+	// 입력 패턴에 대한 에러 계산.
 	pattern_error = actual_output - output_data[pattern_no];
 }
 
 // backpropagation algorithm to update the weights
+// 웨이트 갱신을 위한 역전파 알고리즘
 void backprop(void)
 {
 	// update weights between hidden and output layer
+	// 은닉층~출력층 사이의 웨이트 수정.
 	for (int m = 0; m < NO_HIDDEN_NEURONS; m++)
 	{
 		// update weight matrix
+		// 웨이트에 해당하는 행렬 데이터 값 갱신
 		double weightChange = LR_HO * pattern_error * values_hidden_layer[m];
 		weights_HO[m] -= weightChange;
 
@@ -150,18 +176,22 @@ void backprop(void)
 	}
 
 	// update weights between input and hidden layer
+	// 입력층~은닉층의 웨이트 값 갱신
 	for (int i = 0; i < NO_HIDDEN_NEURONS; i++)
 	{
 		for (int k = 0; k < NO_INPUT_NEURONS; k++)
 		{
 			// update weight matrix
+			/*
+				웨이트 행렬값 갱신
+			*/
 			double weightChange = ((1 - (values_hidden_layer[i] * values_hidden_layer[i])) * weights_HO[i] * pattern_error * LR_IH) * input_data[pattern_no][k];
 			weights_IH[k][i] -= weightChange;
 		}
 	}
 }
 
-// calculate the overall error
+// calculate the overall error 
 void calc_error(void)
 {
 	rms_error = 0.0;
@@ -194,6 +224,7 @@ int main(void)
 	start = clock();
 
 	// train the neural network
+	// 신경망에 학습 시킴
 	for (int j = 0; j <= no_epochs; j++)
 	{
 		for (int i = 0; i < NO_PATTERNS; i++)
@@ -226,7 +257,7 @@ int main(void)
 		feed_forward();
 		printf("target output = %d, actual output = %f\n", output_data[pattern_no], actual_output);
 	}
-
+	// 이건 쌩까도 되는거 : 측정(학습 시간) 계산 함수 
 	// display time elapsed for training
 	cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
 	printf("----------------------------------\n");
