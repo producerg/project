@@ -4,21 +4,17 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
 <title>Main page</title>
 </head>
 <body>
 	<table width="100%" border="0" cellpadding="1" cellspacing="0">
-		<tr>
-			<td>
-				<a href="loginpage.jsp">로그인</a>
-			</td>
-			<td>
-				인증센터 
-			</td>
-			<td>
-				<a href="signin_page.jsp">회원 가입</a>
-			</td>
-		</tr>
 		<tr bgcolor="0F77BC" >
 			<td>
 				<font color="WHITE">금융상품</font>
@@ -57,5 +53,7 @@
 			<jsp:include page="recom.jsp" flush="false"/>
 		</tr>
 	</table>
+</body>
+</html>
 </body>
 </html>
